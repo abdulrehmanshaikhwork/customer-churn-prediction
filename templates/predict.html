@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .prediction-result {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            border-radius: 12px;
+            background: #f8f9fa;
+            border-left: 5px solid;
+        }
+        
+        .prediction-result.churn {
+            border-left-color: #e74c3c;
+            background: #fadbd8;
+        }
+        
+        .prediction-result.no-churn {
+            border-left-color: #27ae60;
+            background: #d5f4e6;
+        }
+        
+        .prediction-result.low {
+            border-left-color: #e74c3c;
+            background: #fadbd8;
+        }
+        
+        .prediction-result.medium {
+            border-left-color: #f39c12;
+            background: #fef5e7;
+        }
+        
+        .prediction-result.high {
+            border-left-color: #e67e22;
+            background: #fdebd0;
+        }
+        
+        .prediction-result.very-high {
+            border-left-color: #27ae60;
+            background: #d5f4e6;
+        }
+        
+        .churn-label {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .churn-label.yes {
+            color: #e74c3c;
+        }
+        
+        .churn-label.no {
+            color: #27ae60;
+        }
+        
+        .churn-label.low {
+            color: #27ae60;
+        }
+        
+        .churn-label.medium {
+            color: #f39c12;
+        }
+        
+        .churn-label.high {
+            color: #e67e22;
+        }
+        
+        .churn-label.very-high {
+            color: #e74c3c;
+        }
+        
+        .probability {
+            font-size: 18px;
+            margin-top: 15px;
+            color: #555;
+        }
+        
+        .probability strong {
+            font-size: 22px;
+            color: #667eea;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 5px solid #f5c6cb;
+        }
+        
+        .input-summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .input-summary h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .summary-item {
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .summary-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .summary-value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-back {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-back:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Prediction Result</h1>
+        
+        {% if error %}
+            <div class="error">
+                <strong>Error:</strong> {{ error }}
+            </div>
+            <a href="/" style="text-decoration: none;">
+                <button class="btn-back">← Back to Form</button>
+            </a>
+        {% else %}
+            {% if customer_id %}
+                <div style="text-align: center; margin-bottom: 20px; padding: 10px; background: #f0f0f0; border-radius: 8px; color: #666;">
+                    <strong>Customer ID:</strong> {{ customer_id }}
+                </div>
+            {% endif %}
+            <div class="prediction-result {% if risk_level %}{{ risk_level }}{% elif churn == 'Yes' %}churn{% else %}no-churn{% endif %}">
+                <div class="churn-label {% if risk_level %}{{ risk_level }}{% elif churn == 'Yes' %}yes{% else %}no{% endif %}">
+                    {% if risk_level == 'low' %}
+                        ✅ LIKELY TO STAY (Very Low Risk)
+                    {% elif risk_level == 'medium' %}
+                        ⚠️ BORDERLINE (Medium Risk)
+                    {% elif risk_level == 'high' %}
+                        ⚠️ HIGH RISK (Likely to Churn)
+                    {% elif risk_level == 'very-high' %}
+                        🔴 LIKELY TO CHURN (Very High Risk)
+                    {% else %}
+                        {% if churn == 'Yes' %}⚠️ LIKELY TO CHURN{% else %}✅ LIKELY TO STAY{% endif %}
+                    {% endif %}
+                </div>
+                <div class="probability">
+                    Churn Probability: <strong>{{ probability }}</strong>
+                    {% if risk_message %}<br><small style="font-size: 14px; color: #555;">Risk Level: {{ risk_message }}</small>{% endif %}
+                    <br><br>
+                    <small style="font-size: 13px; color: #666; line-height: 1.6;">
+                        <strong>Interpretation:</strong><br>
+                        • This customer has <strong>{{ probability }}</strong> probability of churning (leaving)<br>
+                        • This customer has <strong>{{ "%.2f"|format(100 - prob_percentage) }}%</strong> probability of staying (no churn)
+                    </small>
+                </div>
+            </div>
+            
+            {% if data %}
+                <div class="input-summary">
+                    <h3>Customer Information</h3>
+                    <div class="summary-grid">
+                        {% for key, value in data.items() %}
+                            <div class="summary-item">
+                                <div class="summary-label">{{ key }}</div>
+                                <div class="summary-value">{{ value }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="actions">
+                <a href="/" style="text-decoration: none; flex: 1;">
+                    <button class="btn-back">🔄 Make Another Prediction</button>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
