@@ -191,7 +191,7 @@ MIT License - feel free to use this project for learning and development.
 - **GitHub**: [@abdulrehmanshaikhwork](https://github.com/abdulrehmanshaikhwork)
 - **Email**: abdulrehmanshaikhabc@gmail.com
 
-## Acknowledgments 🙏
+## Acknowledgments 🎉
 
 - Dataset: Telco Customer Churn (Kaggle)
 - Built with Flask and scikit-learn
